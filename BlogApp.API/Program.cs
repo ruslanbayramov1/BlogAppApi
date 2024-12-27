@@ -1,6 +1,7 @@
 
-using BlogApp.DAL.Context;
+using BlogApp.BL;
 using BlogApp.DAL;
+using BlogApp.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlogApp.API
@@ -21,8 +22,12 @@ namespace BlogApp.API
             });
 
             builder.Services.AddRepositories();
+            builder.Services.AddAutoMapper();
+            builder.Services.AddServices();
 
             var app = builder.Build();
+
+            app.UseBlogExceptionHandler();
 
             if (app.Environment.IsDevelopment())
             {
