@@ -1,4 +1,6 @@
 ﻿using BlogApp.BL.Exceptions;
+using BlogApp.BL.ExternalServices.Implements;
+using BlogApp.BL.ExternalServices.Interfaces;
 using BlogApp.BL.Services.Implements;
 using BlogApp.BL.Services.Interfaces;
 using FluentValidation;
@@ -14,6 +16,7 @@ public static class ServiceRegistration
 {
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
+        services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IUserService, UserService>();
 

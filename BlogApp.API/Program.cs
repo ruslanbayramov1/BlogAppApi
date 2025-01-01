@@ -3,6 +3,7 @@ using BlogApp.BL;
 using BlogApp.DAL;
 using BlogApp.DAL.Context;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 namespace BlogApp.API
 {
@@ -14,13 +15,15 @@ namespace BlogApp.API
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(builder.Configuration);
 
             builder.Services.AddDbContext<BlogDbContext>(opt =>
             {
                 opt.UseSqlServer(builder.Configuration.GetConnectionString("MSSql-Remote"));
             });
 
+            builder.Services.AddJwtAuthentication(builder.Configuration);
+            builder.Services.AddJwtOptions(builder.Configuration);
             builder.Services.AddAutoMapper();
             builder.Services.AddFluentValidation();
             builder.Services.AddRepositories();
@@ -33,11 +36,15 @@ namespace BlogApp.API
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(opt =>
+                {
+                    opt.EnablePersistAuthorization();
+                });
             }
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

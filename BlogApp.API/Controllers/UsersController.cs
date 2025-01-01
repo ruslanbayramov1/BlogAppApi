@@ -33,7 +33,7 @@ public class UsersController : ControllerBase
     [Route("[action]")]
     public async Task<IActionResult> Login(UserLoginDto dto)
     {
-        await _service.LoginAsync(dto);
-        return Ok();
+        string token = await _service.LoginAsync(dto);
+        return Ok(token);
     }
 }

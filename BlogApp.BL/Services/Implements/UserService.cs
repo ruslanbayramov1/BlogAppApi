@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BlogApp.BL.DTOs.Users;
 using BlogApp.BL.Exceptions.Common;
+using BlogApp.BL.ExternalServices.Interfaces;
 using BlogApp.BL.Services.Interfaces;
 using BlogApp.Core.Entities;
 using BlogApp.Core.Enums;
@@ -13,14 +14,21 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _repository;
     private readonly IMapper _mapper;
-    public UserService(IUserRepository repository, IMapper mapper)
+    private readonly IJwtService _jwtService;
+    public UserService(IUserRepository repository, IMapper mapper, IJwtService jwtService)
     {
         _repository = repository;
         _mapper = mapper;
+        _jwtService = jwtService;
     }
 
     public async Task<int> RegisterAsync(UserCreateDto dto)
     {
+        if (await _repository.GetByUsernameAsync(dto.UserName) != null)
+        {
+            throw new ExistsException<User>();
+        }
+        
         var entity = _mapper.Map<User>(dto);
         entity.PasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(dto.Password);
         entity.Role = (int)Roles.Publisher;
@@ -31,13 +39,17 @@ public class UserService : IUserService
         return entity.Id;
     }
 
-    public async Task LoginAsync(UserLoginDto dto)
+    public async Task<string> LoginAsync(UserLoginDto dto)
     {
         User? user = await _repository.GetByUsernameAsync(dto.UserName);
         if (user == null) throw new NotFoundException<User>("Username or password is wrong");
 
         bool res = BCrypt.Net.BCrypt.EnhancedVerify(dto.Password, user.PasswordHash);
         if (!res) throw new NotFoundException<User>("Username or password is wrong");
+
+        string token = _jwtService.CreateToken(user, 24);
+
+        return token;
     }
 
     public Task DeleteAsync(int id)
