@@ -22,6 +22,9 @@ namespace BlogApp.API
                 opt.UseSqlServer(builder.Configuration.GetConnectionString("MSSql-Remote"));
             });
 
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddCacheServices(builder.Configuration);
+            builder.Services.AddEmailOptions(builder.Configuration);
             builder.Services.AddJwtAuthentication(builder.Configuration);
             builder.Services.AddJwtOptions(builder.Configuration);
             builder.Services.AddAutoMapper();

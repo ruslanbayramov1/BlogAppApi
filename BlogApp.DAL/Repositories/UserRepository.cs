@@ -11,6 +11,9 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     {
     }
 
+    public Task<User?> GetByEmailAsync(string email)
+        => Table.FirstOrDefaultAsync(x => x.Email == email);
+
     public Task<User?> GetByUsernameAsync(string username) 
         => Table.FirstOrDefaultAsync(x => x.UserName == username);
 }

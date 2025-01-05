@@ -16,7 +16,7 @@ public class UsersController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
-    { 
+    {
         var data = await _service.GetAllAsync();
         return Ok(data);
     }
@@ -24,7 +24,7 @@ public class UsersController : ControllerBase
     [HttpPost]
     [Route("[action]")]
     public async Task<IActionResult> Register(UserCreateDto dto)
-    { 
+    {
         int res = await _service.RegisterAsync(dto);
         return StatusCode(StatusCodes.Status201Created, res);
     }
@@ -35,5 +35,21 @@ public class UsersController : ControllerBase
     {
         string token = await _service.LoginAsync(dto);
         return Ok(token);
+    }
+
+    [HttpGet]
+    [Route("[action]")]
+    public async Task<IActionResult> VerifyEmail([FromQuery] string user, [FromQuery] string code)
+    {
+        await _service.VerifyEmail(user, code);
+        return StatusCode(200, "Successfully verified");
+    }
+
+    [HttpPost]
+    [Route("[action]")]
+    public async Task<IActionResult> SendVerifyEmail()
+    {
+        await _service.SendVerifyEmailAsync();
+        return Ok();
     }
 }
